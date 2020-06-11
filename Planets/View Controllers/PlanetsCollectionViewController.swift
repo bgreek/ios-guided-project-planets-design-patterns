@@ -14,10 +14,9 @@ class PlanetsCollectionViewController: UICollectionViewController {
     
     // MARK: - Properties
     
-    let planetController = PlanetController()
-    
     var planets: [Planet] {
         let shouldShowPluto = UserDefaults.standard.bool(forKey: .shouldShowPlutoKey)
+        let planetController = PlanetController.shared
         return shouldShowPluto ? planetController.planetsWithPluto : planetController.planetsWithoutPluto
     }
     
@@ -42,6 +41,8 @@ class PlanetsCollectionViewController: UICollectionViewController {
             
 			// Listen for popover or iOS13 modal is dismissed notifications
 			detailVC.presentationController?.delegate = self
+            
+            detailVC.delegate = self
         }
         
         if segue.identifier == "ShowPlanetDetail" {
@@ -89,4 +90,10 @@ extension PlanetsCollectionViewController: UIAdaptivePresentationControllerDeleg
 		// popover, we should update the UI based on the new state
 		updateViews()
 	}
+}
+
+extension PlanetsCollectionViewController : SettingsViewControllerProtocol {
+    func plutoPlanetStatusChanged() {
+        updateViews()
+    }
 }

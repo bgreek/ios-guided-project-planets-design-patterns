@@ -35,4 +35,33 @@ class PlanetDetailViewController: UIViewController {
         imageView.image = planet.image
         label.text = planet.name
     }
+    
+    override func encodeRestorableState(with coder: NSCoder) {
+        // Our super class to encode and info it needs
+        super.encodeRestorableState(with: coder)
+        // Make sure you have something to save.
+        // Property list is a file that is helpful in saving configurations (XML)
+        guard let existingPlanet = planet else { return }
+        
+        do {
+            let planetData = try PropertyListEncoder().encode(existingPlanet)
+            coder.encode(planetData, forKey: "existingPlanet")
+        } catch {
+            print(error)
+            return
+        }
+    }
+    
+    override func decodeRestorableState(with coder: NSCoder) {
+        super.decodeRestorableState(with: coder)
+        
+        guard let planetData = coder.decodeObject(forKey: "existingPlanet") as? Data else { return }
+        
+        do {
+            let savedPlanet = try PropertyListDecoder().decode(Planet.self, from: planetData)
+            planet = savedPlanet
+        } catch {
+            print(error)
+        }
+    }
 }
